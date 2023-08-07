@@ -48,6 +48,13 @@ jobs:
         run: go test ./...
         working-directory: v2/
 
+      # issue with goccy/go-yaml: https://github.com/goccy/go-yaml/issues/65
+      - name: Convert Line Endings on Windows
+        if: ${{ matrix.os == 'windows-latest' }}
+        run: |
+          find . -type f -exec unix2dos {} +
+        working-directory: integration_tests/
+
       - name: Integration Tests
         timeout-minutes: 50
         env:
@@ -56,12 +63,6 @@ jobs:
         run: |
           chmod +x run.sh
           bash run.sh ${{ matrix.os }}
-          
-          # Check if the operating system is Windows
-          if [ "$MATRIX_OS" == "windows-latest" ]; then
-            # issue with goccy/go-yaml: https://github.com/goccy/go-yaml/issues/65
-            find . -type f -exec dos2unix {} +
-          fi
         working-directory: integration_tests/
       
       # - name: Race Condition Tests
