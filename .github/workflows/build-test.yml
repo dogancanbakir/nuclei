@@ -17,12 +17,6 @@ jobs:
 
     runs-on: ${{ matrix.os }}
     steps:
-      # TODO: remove this step
-      - uses: actions/checkout@v3
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-        with:
-          detached: true
 
       - name: Set up Go
         uses: actions/setup-go@v4
@@ -41,6 +35,12 @@ jobs:
       - name: Build
         run: go build .
         working-directory: v2/cmd/nuclei/
+
+      # TODO: remove this step
+      - uses: actions/checkout@v3
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        timeout-minutes: 45
 
       - name: Test
         env:
