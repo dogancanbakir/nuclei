@@ -52,7 +52,8 @@ jobs:
       - name: Convert Line Endings on Windows
         if: ${{ matrix.os == 'windows-latest' }}
         run: |
-          find . -type f -exec dos2unix {} +
+          Get-ChildItem -Recurse -File | ForEach-Object { dos2unix $_.FullName }
+        shell: pwsh
         working-directory: integration_tests/
 
       - name: Integration Tests
