@@ -13,10 +13,17 @@ jobs:
     strategy:
       matrix:
         go-version: [1.20.x]
-        os: [ubuntu-latest, windows-latest, macOS-latest]
+        os: [windows-latest]
 
     runs-on: ${{ matrix.os }}
     steps:
+      # TODO: remove this step
+      - uses: actions/checkout@v3
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        with:
+          detached: true
+
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
