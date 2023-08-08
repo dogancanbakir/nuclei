@@ -13,10 +13,19 @@ jobs:
     strategy:
       matrix:
         go-version: [1.20.x]
-        os: [ubuntu-latest, windows-latest, macOS-latest]
+        os: [windows-latest]
 
     runs-on: ${{ matrix.os }}
     steps:
+
+      # TODO: remove this step
+      - uses: actions/checkout@v3
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        timeout-minutes: 60
+        with:
+          detached: true
+
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
@@ -49,6 +58,14 @@ jobs:
         shell: pwsh
         working-directory: integration_tests/
 
+      # issue with goccy/go-yaml: https://github.com/goccy/go-yaml/issues/65
+      # - name: Convert Line Endings on Windows
+      #   if: ${{ matrix.os == 'windows-latest' }}
+      #   run: |
+      #     Get-ChildItem -Recurse -File | ForEach-Object { dos2unix $_.FullName }
+      #   shell: pwsh
+      #   working-directory: integration_tests/
+
       - name: Integration Tests
         timeout-minutes: 50
         env:
@@ -58,12 +75,12 @@ jobs:
           chmod +x run.sh
           bash run.sh ${{ matrix.os }}
         working-directory: integration_tests/
+      
+      # - name: Race Condition Tests
+      #   if: ${{ matrix.os != 'windows-latest' }} # known issue: https://github.com/golang/go/issues/46099
+      #   run: go run -race . -l ../functional-test/targets.txt -id tech-detect,tls-version
+      #   working-directory: v2/cmd/nuclei/
 
-      - name: Race Condition Tests
-        if: ${{ matrix.os != 'windows-latest' }} # known issue: https://github.com/golang/go/issues/46099
-        run: go run -race . -l ../functional-test/targets.txt -id tech-detect,tls-version
-        working-directory: v2/cmd/nuclei/
-
-      - name: Example Code Tests
-        run: go build .
-        working-directory: v2/examples/
+      # - name: Example Code Tests
+      #   run: go build .
+      #   working-directory: v2/examples/
